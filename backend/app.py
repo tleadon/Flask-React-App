@@ -1,30 +1,24 @@
-from flask import Flask, send_from_directory
+#%%
+from flask import Flask, jsonify
 from flask_cors import CORS
 import csv
 import os
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-DIST_DIR = os.path.join(BASE_DIR, "frontend", "dist")
-CSV_DIR = os.path.join(BASE_DIR, "backend", "app", "data", "NIBFakeDatabase.csv")
+CSV_DIR = os.path.join(os.path.dirname(__file__), 'data', 'NIBFakeDatabase.csv')
 
-app = Flask(
-    __name__,
-    static_folder=DIST_DIR,
-    template_folder=DIST_DIR
-)
+app = Flask(__name__)
 CORS(app)
+
+def load_data():
+    with open(CSV_DIR, mode='r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        data = [row for row in csv_reader]
+    return data
 
 @app.route('/')
 def index():
-    print("DIST_DIR:", DIST_DIR)
-    print("index.html exists:", os.path.exists(os.path.join(DIST_DIR, "index.html")))
-    print("CSV_DIR:", CSV_DIR)
-    return send_from_directory(app.template_folder, "index.html")
-
-@app.route('/assets/<path:filename>')
-def serve_assets(filename):
-    return send_from_directory(os.path.join(app.static_folder, 'assets'), filename)
-
+    return jsonify(load_data())
+#%%
 @app.route('/nib_num/<int:nib_num>')
 def method_name(nib_num):
     print(f"Received NIB number: {nib_num}")
@@ -33,7 +27,7 @@ def method_name(nib_num):
         for row in csv_reader:
             if int(row['NIB Number']) == nib_num:
                 return row
-    return {"nibnum" : nib_num}
+    return {"nibnum" : f"Could not find NIB number {nib_num}"}, 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
