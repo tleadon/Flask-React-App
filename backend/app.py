@@ -5,7 +5,7 @@ import os
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DIST_DIR = os.path.join(BASE_DIR, "frontend", "dist")
-CSV_DIR = os.path.join(BASE_DIR, "backend", "app", "data", "NIBFakeDatabase.csv")
+CSV_DIR = os.path.join(BASE_DIR, "backend", "data", "NIBFakeDatabase.csv")
 
 app = Flask(
     __name__,
