@@ -10,28 +10,47 @@ import {
 export default function Form() {
   const [inputValue, setInputValue] = useState("");
   const [result, setResult] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [apiKey, setApiKey] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted");
     console.log("Submitted value:", inputValue);
-    fetch(`http://localhost:8000/nib_num/${inputValue}`, {
+    setLoading(true);
+    fetch(`http://localhost:5000/nib_num/${inputValue}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer c929a88edb9ad6a7c00bd839dcaf115906b3ce531a59802e628efcd446a2f09f`,
+        Authorization: `Bearer ${apiKey}`,
       },
     })
       .then((response) => response.json())
       .then((data) => {
         console.log("Response data:", data);
         setResult(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   return (
     <>
       <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+        <FormControl style={{ width: "100%", paddingBottom: "1em" }}>
+          <InputLabel htmlFor="my-input">API Key</InputLabel>
+          <Input
+            id="my-input"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            aria-describedby="my-helper-text"
+          />
+        </FormControl>
         <FormControl style={{ width: "100%" }}>
           <InputLabel htmlFor="my-input">NIB Number</InputLabel>
           <Input
@@ -53,6 +72,8 @@ export default function Form() {
           </Button>
         </FormControl>
       </form>
+      {loading && <p style={{ color: "blue" }}>Loading...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
       {result && (
         <table
           style={{

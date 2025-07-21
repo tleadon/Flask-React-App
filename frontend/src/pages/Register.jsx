@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PasswordChecklist from "react-password-checklist";
 import {
   Button,
   FormControl,
@@ -10,25 +11,33 @@ import {
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordAgain, setPasswordAgain] = useState("");
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("/register", {
+    if (password !== passwordAgain) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    fetch("http://localhost:5000/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ username, password }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log("Registration successful:", data);
-    } else {
-      const errorData = await response.json();
-      setError(errorData.message);
-    }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Registration successful:", data);
+        setSuccess(data.message);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+      });
   };
 
   return (
@@ -53,11 +62,37 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </FormControl>
-        <Button type="submit" variant="contained" color="primary">
-          Register
+        <FormControl fullWidth margin="normal">
+          <InputLabel htmlFor="passwordAgain">Re-type Password</InputLabel>
+          <Input
+            id="passwordAgain"
+            type="password"
+            value={passwordAgain}
+            onChange={(e) => setPasswordAgain(e.target.value)}
+          />
+        </FormControl>
+        <PasswordChecklist
+          rules={["minLength", "specialChar", "number", "capital", "match"]}
+          minLength={8}
+          align="left"
+          value={passwordAgain}
+          valueAgain={password}
+          onChange={(isValid) => {
+            console.log(isValid);
+          }}
+          style={{ textAlign: "left" }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          style={{ marginTop: "3em" }}
+        >
+          Submit
         </Button>
       </form>
-      {error && <p>{error}</p>}
+      {success && <p style={{ color: "green" }}>{success}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };
