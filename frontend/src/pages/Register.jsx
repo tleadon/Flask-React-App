@@ -75,8 +75,8 @@ const Register = () => {
           rules={["minLength", "specialChar", "number", "capital", "match"]}
           minLength={8}
           align="left"
-          value={passwordAgain}
-          valueAgain={password}
+          value={password}
+          valueAgain={passwordAgain}
           onChange={(isValid) => {
             console.log(isValid);
           }}
