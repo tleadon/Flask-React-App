@@ -1,0 +1,212 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "NIB Number API",
+    "version": "0.0.1",
+    "description": "API for managing access to NIB numbers."
+  },
+  "securityDefinitions": {
+    "ApiKeyAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Use 'Bearer {api_key}' to access 'Protected' areas of this API.\n API keys are accessed through the 'Authenication' by registering and logging in."
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "Operations related to user authentication"
+    },
+    {
+      "name": "Protected",
+      "description": "Operations related to accessing NIB numbers."
+    }
+  ],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register a new user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "firstnamelastname123"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "badpassword"
+                }
+              },
+              "required": ["username", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "New user registered!",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "message": "New user registered!"
+              }
+            }
+          },
+          "400": {
+            "description": "Missing fields",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "message": "Missing fields"
+              }
+            }
+          },
+          "409": {
+            "description": "User already exists.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              },
+              "example": {
+                "message": "User already exists"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Log in a user to receive an API key",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "example": "firstnamelastname123"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "badpassword"
+                }
+              },
+              "required": ["username", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The login was successful and the user is able to see their API key.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Login successful."
+                },
+                "api_key": {
+                  "type": "string",
+                  "example": "supersecretcode123456"
+                }
+              },
+              "example": {
+                "message": "Login successful.",
+                "api_key": "supersecretcode123456"
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid credentials"
+                }
+              },
+              "example": {
+                "message": "Invalid credentials"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/protected": {
+      "get": {
+        "tags": ["Protected"],
+        "summary": "Access a protected resource",
+        "responses": {
+          "200": {
+            "description": "You have access!",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "You have access!"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "You have access!"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Invalid API key.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Invalid API key."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
